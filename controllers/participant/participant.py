@@ -4,20 +4,13 @@ from controller import Robot
 
 
 def getDistance(sensor):
-    """
-    Return the distance of an obstacle for a sensor.
-
-    The value returned by the getValue() method of the distance sensors
-    corresponds to a physical value (here we have a sonar, so it is the
-    strength of the sonar ray). This function makes a conversion to a
-    distance value in meters.
-    """
+    
     return ((1000 - sensor.getValue()) / 1000) * 5
 
 
 # Maximum speed for the velocity value of the wheels.
 # Don't change this value.
-MAX_SPEED = 5.24
+MAX_SPEED = 6.28
 
 # Get pointer to the robot.
 robot = Robot()
@@ -44,12 +37,12 @@ sideSensor.enable(timestep)
 leftWheel.setVelocity(MAX_SPEED)
 rightWheel.setVelocity(MAX_SPEED)
 while robot.step(timestep) != -1:
-    if getDistance(frontSensor) < 0.5:
+    if getDistance(frontSensor) < 0.1:
         break
 
 # Rotate clockwise until the wall is to our left.
-leftWheel.setVelocity(MAX_SPEED)
-rightWheel.setVelocity(-MAX_SPEED)
+leftWheel.setVelocity(MAX_SPEED * 0.7)
+rightWheel.setVelocity(-MAX_SPEED * 0.7)
 while robot.step(timestep) != -1:
     # Rotate until there is a wall to our left, and nothing in front of us.
     if getDistance(sideSensor) < 1:
@@ -59,14 +52,22 @@ while robot.step(timestep) != -1:
 while robot.step(timestep) != -1:
 
     # Too close to the wall, we need to turn right.
-    if getDistance(sideSensor) < 0.4:
+    if getDistance(sideSensor) < 0.1:
         leftWheel.setVelocity(MAX_SPEED)
-        rightWheel.setVelocity(MAX_SPEED * 0.9)
+        rightWheel.setVelocity(MAX_SPEED * 0.5)
+        print(getDistance(sideSensor))
+        
+    elif getDistance(frontSensor) < 0.2:
+        leftWheel.setVelocity(MAX_SPEED)
+        rightWheel.setVelocity(-MAX_SPEED)
+        robot.step(300)
+        print(getDistance(frontSensor))
 
     # Too far from the wall, we need to turn left.
-    elif getDistance(sideSensor) > 0.6:
-        leftWheel.setVelocity(MAX_SPEED * 0.9)
+    elif getDistance(sideSensor) > 0.2:
+        leftWheel.setVelocity(MAX_SPEED * 0.5)
         rightWheel.setVelocity(MAX_SPEED)
+        print(getDistance(sideSensor))
 
     # We are in the right direction.
     else:
